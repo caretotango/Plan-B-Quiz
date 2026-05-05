@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plan B Guide & Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #fdf4ff; color: #1a1a2e; min-height: 100vh; display: flex; justify-content: center; padding: 24px 16px; }
+  #app { width: 100%; max-width: 580px; }
+  .header { text-align: center; margin-bottom: 28px; }
+  .header .emoji { font-size: 36px; margin-bottom: 6px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #7c3aed; }
+  .header .sub { font-size: 13px; color: #6b7280; margin-top: 4px; }
+  .header .disclaimer-top { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+  .card { border-radius: 16px; padding: 22px; margin-bottom: 16px; }
+  .card-purple { background: #faf5ff; border: 1px solid #e9d5ff; }
+  .card-white { background: #fff; border: 1px solid #e5e7eb; }
+  .card-pink { background: #fdf2f8; border: 1px solid #f0abfc; }
+  .card-yellow { background: #fff7ed; border: 1px solid #fdba74; }
+  .card-slate { background: #f1f5f9; border: 1px solid #cbd5e1; }
+  .card-green { background: #f0fdf4; border: 2px solid #86efac; }
+  .card-amber { background: #fefce8; border: 2px solid #fde047; }
+  p { line-height: 1.7; font-size: 15px; }
+  .btn-primary { width: 100%; background: #7c3aed; color: #fff; border: none; border-radius: 12px; padding: 14px 20px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: #6d28d9; }
+  .btn-secondary { width: 100%; background: #f3f4f6; color: #374151; border: none; border-radius: 12px; padding: 13px 20px; font-size: 15px; cursor: pointer; font-weight: 500; transition: background 0.2s; }
+  .btn-secondary:hover { background: #e5e7eb; }
+  .btn-back { background: none; border: none; color: #9ca3af; font-size: 13px; cursor: pointer; margin-top: 14px; padding: 0; }
+  .btn-back:hover { color: #6b7280; }
+  .option-btn { width: 100%; background: #fff; border: 2px solid #e9d5ff; border-radius: 12px; padding: 14px 18px; font-size: 15px; text-align: left; cursor: pointer; color: #1a1a2e; transition: all 0.15s; margin-bottom: 10px; font-family: inherit; }
+  .option-btn:hover { border-color: #7c3aed; background: #faf5ff; }
+  .options { display: flex; flex-direction: column; }
+  .progress-bar-bg { background: #e5e7eb; border-radius: 99px; height: 6px; margin-bottom: 20px; }
+  .progress-bar { background: #7c3aed; border-radius: 99px; height: 6px; transition: width 0.3s; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; margin-bottom: 6px; }
+  .question-text { font-size: 17px; font-weight: 600; line-height: 1.5; }
+  .result-tag { font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 8px; }
+  .result-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .next-steps-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  ol { padding-left: 20px; }
+  ol li { font-size: 14px; margin-bottom: 8px; line-height: 1.6; }
+  .reassurance { font-size: 15px; line-height: 1.7; font-style: italic; }
+  .warning-title { font-weight: 700; margin-bottom: 8px; font-size: 14px; color: #92400e; }
+  .warning-list { padding-left: 18px; margin-top: 8px; }
+  .warning-list li { font-size: 13px; margin-bottom: 8px; line-height: 1.6; color: #92400e; }
+  .warning-footer { margin-top: 10px; font-weight: 600; font-size: 13px; color: #92400e; }
+  .disclaimer-text { font-size: 12px; color: #64748b; line-height: 1.6; }
+  .reminder-text { font-size: 13px; color: #64748b; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const QUESTIONS = [
+  {
+    id: "timing",
+    text: "When did you take Plan B after unprotected sex?",
+    options: [
+      { label: "Within 24 hours", value: "under24" },
+      { label: "24–72 hours", value: "24to72" },
+      { label: "72–120 hours (3–5 days)", value: "72to120" },
+      { label: "More than 120 hours (5+ days)", value: "over120" },
+    ],
+  },
+  {
+    id: "cycle_phase",
+    text: "Where were you in your cycle when you took it?",
+    options: [
+      { label: "On my period (day 1–6)", value: "period" },
+      { label: "Just after my period (day 7–9)", value: "post_period" },
+      { label: "Middle of cycle / around ovulation (day 10–17ish)", value: "ovulation" },
+      { label: "After ovulation / before next period (luteal phase)", value: "luteal" },
+      { label: "I was on hormonal birth control", value: "bc" },
+      { label: "I'm not sure", value: "unsure" },
+    ],
+  },
+  {
+    id: "mucus",
+    text: "Around the time of sex, did you notice any cervical mucus or feel 'wet'?",
+    options: [
+      { label: "Yes — stretchy, clear, slippery (like egg white)", value: "fertile_mucus" },
+      { label: "Yes — some wetness but not stretchy", value: "some_mucus" },
+      { label: "No — dry or none", value: "no_mucus" },
+      { label: "I didn't notice / not sure", value: "unsure" },
+    ],
+  },
+  {
+    id: "bleeding",
+    text: "Have you had any bleeding or spotting since taking Plan B?",
+    options: [
+      { label: "Yes — a bleed 3–7 days after taking it (withdrawal bleed)", value: "withdrawal" },
+      { label: "Yes — light spotting / brown discharge", value: "spotting" },
+      { label: "Yes — a full period-like bleed within 2 weeks", value: "period_bleed" },
+      { label: "No bleeding at all yet", value: "none" },
+    ],
+  },
+  {
+    id: "days_since",
+    text: "How long ago did you take Plan B?",
+    options: [
+      { label: "Less than 1 week ago", value: "under1w" },
+      { label: "1–2 weeks ago", value: "1to2w" },
+      { label: "2–3 weeks ago", value: "2to3w" },
+      { label: "More than 3 weeks ago", value: "over3w" },
+    ],
+  },
+  {
+    id: "symptoms",
+    text: "Are you experiencing any of the following? (pick the closest)",
+    options: [
+      { label: "Nausea, fatigue, sore breasts — started after Plan B", value: "planb_symptoms" },
+      { label: "Sore breasts, cramping, mood changes — feel like PMS", value: "pms_symptoms" },
+      { label: "Very sore breasts, nausea, fatigue — more intense than usual", value: "pregnancy_symptoms" },
+      { label: "No real symptoms", value: "none" },
+    ],
+  },
+  {
+    id: "test",
+    text: "Have you taken a pregnancy test?",
+    options: [
+      { label: "Yes — it was negative", value: "neg" },
+      { label: "Yes — it was positive", value: "pos" },
+      { label: "No — it's too early", value: "too_early" },
+      { label: "No — I haven't taken one yet", value: "not_yet" },
+    ],
+  },
+];
+
+function getResult(a) {
+  if (a.timing === "over120") return {
+    style: "amber",
+    icon: "⚠️", label: "Plan B May Not Have Been Effective",
+    title: "Plan B Was Likely Not Effective — But Don't Panic",
+    summary: "Plan B needs to be taken within 120 hours (5 days) to have any effect. Since it was taken after that window, it would not have worked to delay ovulation. This doesn't automatically mean you're pregnant — the fertile window is only the 5 days prior to ovulation and ovulation day itself (the egg survives just 12–24 hours after release). If you were outside that window, there is no risk of pregnancy. If you were within it, natural odds of conception from unprotected intercourse are around 25%, and can vary depending on age and other individual factors.",
+    steps: ["Take a pregnancy test 2–3 weeks after the unprotected sex (not from when you took Plan B).", "If your period doesn't arrive within 3 weeks, test even if you tested earlier.", "Reach out to a healthcare provider if you'd like to discuss options."],
+    reassurance: "Whatever comes next, you're not alone in this. Many women have been in this exact position. You reached out, you're being proactive — that matters."
+  };
+
+  if (a.test === "pos") return {
+    style: "pink",
+    icon: "💜", label: "Positive Test",
+    title: "Your Test Came Back Positive",
+    summary: "A positive pregnancy test after Plan B means the pill was not able to prevent this pregnancy — this can happen, especially if taken closer to or after ovulation. Plan B has an efficacy range of roughly 40–85% depending on timing. A positive result at 2–3 weeks post-intercourse is considered reliable.",
+    steps: ["Contact your doctor or a women's health clinic to confirm with bloodwork (hCG levels).", "You can also ask to test progesterone levels — Plan B can sometimes lower luteal progesterone.", "Your doctor can walk you through all of your options with full support.", "If you're in Canada, you can call a clinic directly — no GP referral needed in most cases."],
+    reassurance: "This is a lot to process, and however you're feeling right now is valid. You are not alone, and there is support available to you — whatever you decide."
+  };
+
+  if (a.bleeding === "withdrawal" || a.cycle_phase === "period" || a.cycle_phase === "post_period" || (a.timing === "under24" && a.mucus === "no_mucus")) return {
+    style: "green",
+    icon: "💚", label: "Likely Worked",
+    title: "Plan B Likely Worked 💚",
+    summary: a.bleeding === "withdrawal"
+      ? "A withdrawal bleed 3–7 days after taking Plan B is one of the most reassuring signs — it indicates that ovulation was likely delayed, meaning there was no egg for sperm to fertilize. A withdrawal bleed is caused by the drop in synthetic hormone from Plan B as it leaves your body, which can trigger some premature shedding of the uterine lining. It's usually lighter than a normal period."
+      : a.cycle_phase === "period"
+      ? "Taking Plan B during your period means ovulation likely hasn't happened yet. Plan B is most effective in this window. You may notice your period stops and starts again, lingers a little longer, or you may experience a withdrawal bleed a few days after — all of this is normal. A withdrawal bleed is caused by the drop in synthetic hormone from Plan B as it clears your body, triggering some light shedding of the uterine lining."
+      : "Taking it just after your period means ovulation likely hasn't occurred yet, and Plan B is most effective in this window. You may experience a withdrawal bleed around 3–7 days after taking it — this is caused by the drop in synthetic hormone from Plan B as it leaves your body, which can trigger some light, premature shedding of the uterine lining. This is a reassuring sign.",
+    steps: [
+      (a.days_since === "over3w" || a.days_since === "2to3w") ? "Take a pregnancy test now just to confirm — at 2–3 weeks it will be reliable." : "Take a pregnancy test at the 2-week mark from when you had sex, just to double-check.",
+      "Your next period may be delayed by a few days to a few weeks — this is normal.",
+      "Once you get a withdrawal bleed, ovulation will still need to happen before your true period arrives — use protection during this time."
+    ],
+    reassurance: "Take a breath. The signs are reassuring. Your body has been through a hormonal shift and that's okay — it will settle. You were smart to act quickly."
+  };
+
+  if (a.cycle_phase === "ovulation" || a.mucus === "fertile_mucus") return {
+    style: "amber",
+    icon: "🕐", label: "Uncertain — Test to Confirm",
+    title: "It's Hard to Say — Here's What to Watch For",
+    summary: "You took Plan B around the time of ovulation or during your fertile window, which is the trickiest timing. Studies show that Plan B is less effective at halting ovulation once the LH surge has already begun (24–36 hours before ovulation). That said, it may still have other ways of reducing pregnancy risk. And remember — the fertile window is only the 5 days before ovulation and ovulation day itself. Once that 12–24 hour window after ovulation closes, the egg is no longer viable and pregnancy is not possible from that encounter.",
+    steps: ["If you took Plan B around ovulation or right before, watch for a bleed within 10–14 days — this would likely be your period arriving, which is a reassuring sign that ovulation occurred and pregnancy did not.", "If you see a lighter withdrawal bleed within 3–7 days of taking Plan B, that can also be a good sign — it may mean ovulation was delayed or hadn't happened yet, possibly meaning you were earlier in your cycle than you thought.", "Take a pregnancy test at 2–3 weeks from the date of sex. This is the most reliable way to know.", "If you see light spotting (pink/brown, 1–2 days) around 5–10 days after presumed ovulation, this could be implantation bleeding — test a few days after.", "If no period and no positive test by 3 weeks — test again."],
+    reassurance: "Not knowing is really hard, and it's okay to feel anxious. Most women in this situation are not pregnant. Give yourself 2–3 weeks and then you'll have a clearer answer. You're doing everything right."
+  };
+
+  if (a.cycle_phase === "luteal") return {
+    style: "green",
+    icon: "✅", label: "Likely Fine",
+    title: "You're Most Likely Fine",
+    summary: "If you took Plan B in your luteal phase (after ovulation, before your next period), ovulation had already occurred. Plan B works mainly by delaying ovulation — so in the luteal phase, its primary mechanism doesn't apply. It's also worth knowing that the fertile window is only the 5 days prior to ovulation and ovulation day itself — once ovulation has passed and that 12–24 hour window where the egg can survive has closed, there is no risk of pregnancy from that cycle. Plan B may still have had some effect on the uterine environment, but if you were genuinely past ovulation and that window has closed, there is no risk of pregnancy from that encounter.",
+    steps: ["Your period may be slightly delayed — up to 5 days later than expected. This is normal.", "If your period doesn't arrive within 2 weeks of when it was due, take a pregnancy test.", "At the 2–3 week mark from sex, a pregnancy test will be reliable."],
+    reassurance: "The odds are in your favour. Most women in this situation get their period on time or close to it. Keep an eye out and test if needed — you've got this."
+  };
+
+  if (a.cycle_phase === "bc") return {
+    style: "green",
+    icon: "✅", label: "Likely Fine",
+    title: "You're Very Likely Fine",
+    summary: "If you're taking hormonal birth control correctly, it is already more effective than Plan B alone. Taking Plan B on top of it adds an extra layer of caution. You may notice some spotting or an earlier/later period — this is due to the difference in hormone levels between Plan B and your regular pill.",
+    steps: ["Continue your birth control as normal, even if you see some spotting.", "If you still haven't gotten your period within the expected window or have any concerns, take a pregnancy test.", "Do NOT restart your pack if a test comes back positive — see a doctor."],
+    reassurance: "If you're taking your hormonal birth control correctly, it is usually enough on its own — no Plan B needed. If there was a slip (missed pills, late patch, etc.), taking Plan B (levonorgestrel) as a backup is a reasonable choice. You may notice some extra PMS-like symptoms or nausea — this is normal and should settle. If you took Plan B because you missed a pill or took your birth control incorrectly, your next bleed should come as it normally would, though it may be a few days delayed. If you don't get a bleed, take a test — and either way you're welcome to test at the 2-week mark just to double check. Try not to spiral — if your birth control has been taken correctly, you're well protected."
+  };
+
+  return {
+    style: "amber",
+    icon: "🕐", label: "Uncertain — Test to Confirm",
+    title: "It's Too Early to Tell — Here's Your Roadmap",
+    summary: "Without knowing exactly where you were in your cycle, it's hard to give a definitive answer — and that uncertainty is genuinely hard to sit with. What we do know is that Plan B is most effective when taken quickly, and you took it within the recommended window.",
+    steps: ["Take a pregnancy test 2–3 weeks after the unprotected sex for a reliable result.", "Watch for a withdrawal bleed (3–7 days after taking Plan B) — this is a reassuring sign.", "If your period hasn't arrived 3 weeks after taking Plan B, test.", "If you get a positive test, contact your doctor or a women's health clinic."],
+    reassurance: "The waiting is the hardest part. Be gentle with yourself. You did the right things. In 2–3 weeks you'll have a clear answer, and whatever that answer is, there is support available to you."
+  };
+}
+
+const CARD_STYLES = {
+  green:  { bg: "#f0fdf4", border: "2px solid #86efac" },
+  amber:  { bg: "#fefce8", border: "2px solid #fde047" },
+  pink:   { bg: "#fdf2f8", border: "2px solid #f0abfc" },
+};
+
+let state = { step: -1, answers: {} };
+
+function render() {
+  const app = document.getElementById("app");
+  const { step, answers } = state;
+  const q = QUESTIONS[step];
+
+  let html = `
+    <div class="header">
+      <div class="emoji">🌸</div>
+      <h1>Plan B Guide & Quiz</h1>
+      <p class="sub">A safe, judgement-free space to help you understand what to expect</p>
+      <p class="disclaimer-top">⚕️ This is not medical advice. Always consult a healthcare provider.</p>
+    </div>`;
+
+  if (step === -1) {
+    html += `
+      <div class="card card-purple">
+        <p>Hi — you're in the right place. 💜<br><br>
+        This quiz will ask you a few questions about when you took Plan B and what you've noticed since. Based on your answers, we'll share what we think is most likely happening, what to watch for, and your next steps.<br><br>
+        There are no wrong answers. Take your time.</p>
+      </div>
+      <button class="btn-primary" onclick="next(-1, null)">Start the Quiz →</button>`;
+
+  } else if (step < QUESTIONS.length) {
+    const pct = Math.round((step / QUESTIONS.length) * 100);
+    html += `
+      <div class="progress-label"><span>Question ${step + 1} of ${QUESTIONS.length}</span><span>${pct}% complete</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div class="card card-purple"><p class="question-text">${q.text}</p></div>
+      <div class="options">
+        ${q.options.map(o => `<button class="option-btn" onclick="next(${step}, '${o.value}')">${o.label}</button>`).join("")}
+      </div>
+      ${step > 0 ? `<button class="btn-back" onclick="back()">← Go back</button>` : ""}`;
+
+  } else {
+    const r = getResult(answers);
+    const s = CARD_STYLES[r.style];
+    html += `
+      <div class="card" style="background:${s.bg};border:${s.border}">
+        <div class="result-tag">${r.icon} ${r.label}</div>
+        <div class="result-title">${r.title}</div>
+        <p>${r.summary}</p>
+      </div>
+      <div class="card card-white">
+        <div class="next-steps-title">📋 Your Next Steps</div>
+        <ol>${r.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+      </div>
+      <div class="card card-pink">
+        <p class="reassurance">💜 ${r.reassurance}</p>
+      </div>
+      <div class="card card-yellow">
+        <div class="warning-title">🚨 When to Seek Medical Attention</div>
+        <p style="font-size:13px;color:#92400e;line-height:1.6;">Some light spotting after Plan B is common and usually settles within a week. Bleeding that stretches to 2 weeks is less common but does happen — it's typically light and tapers off on its own. If it hasn't stopped by 2–3 weeks, check in with your GP. Here's what to actually watch for:</p>
+        <ul class="warning-list">
+          <li><strong>Heavy bleeding that isn't slowing down past 2–3 weeks</strong> — light spotting that comes and goes is normal; consistently heavy bleeding is not. See your GP.</li>
+          <li><strong>Severe cramping on one side of your abdomen</strong> — especially alongside a positive pregnancy test. This can be a sign of an ectopic pregnancy. Go to emergency.</li>
+          <li><strong>A positive pregnancy test with any pain or bleeding</strong> — get checked promptly by your GP or clinic.</li>
+          <li><strong>Fever, chills, or unusual discharge</strong> — these are not Plan B side effects and should be assessed by a doctor.</li>
+        </ul>
+        <div class="warning-footer">If something feels off, trust yourself and get checked. 💛</div>
+      </div>
+      <div class="card card-slate">
+        <p class="disclaimer-text"><strong>⚕️ Medical Disclaimer:</strong> This quiz is for informational and educational purposes only and is based on current research and personal experience. It is <strong>not</strong> a substitute for professional medical advice, diagnosis, or treatment. Every body is different and results may vary. Always consult a qualified healthcare provider with any medical concerns. If you are experiencing a medical emergency, call emergency services or go to your nearest emergency department immediately.</p>
+      </div>
+      <button class="btn-secondary" onclick="restart()">Start Over</button>`;
+  }
+
+  app.innerHTML = html;
+}
+
+function next(step, val) {
+  if (step === -1) {
+    state.step = 0;
+  } else {
+    state.answers[QUESTIONS[step].id] = val;
+    state.step = step + 1;
+  }
+  render();
+  window.scrollTo(0, 0);
+}
+
+function back() {
+  if (state.step > 0) { state.step--; render(); window.scrollTo(0, 0); }
+}
+
+function restart() {
+  state = { step: -1, answers: {} };
+  render();
+  window.scrollTo(0, 0);
+}
+
+render();
+</script>
+</body>
+</html>
